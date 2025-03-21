@@ -4,26 +4,20 @@ import java.awt.GraphicsConfiguration;
 import java.awt.HeadlessException;
 
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.SwingConstants;
 
 public class Gra extends JFrame {
 
 	public Gra() throws HeadlessException {
-		// TODO Auto-generated constructor stub
+		 setTitle("Gra");
+	        setSize(400, 300);
+	        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+	        setLocationRelativeTo(null);
+	        JLabel label = new JLabel("Tu będzie gra!", SwingConstants.CENTER);
+	        add(label);
+	        setVisible(true);
 	}
 
-	public Gra(GraphicsConfiguration gc) {
-		super(gc);
-		// TODO Auto-generated constructor stub
-	}
-
-	public Gra(String title) throws HeadlessException {
-		super(title);
-		// TODO Auto-generated constructor stub
-	}
-
-	public Gra(String title, GraphicsConfiguration gc) {
-		super(title, gc);
-		// TODO Auto-generated constructor stub
-	}
-
+	
 }

@@ -4,26 +4,22 @@ import java.awt.GraphicsConfiguration;
 import java.awt.HeadlessException;
 
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.SwingConstants;
 
 public class Tutorial extends JFrame {
 
 	public Tutorial() throws HeadlessException {
-		// TODO Auto-generated constructor stub
+		 setTitle("Tutorial");
+	        setSize(400, 300);
+	        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+	        setLocationRelativeTo(null);
+	        JLabel label = new JLabel("Tu będzie tutorial szachowy!", SwingConstants.CENTER);
+	        add(label);
+	        setVisible(true);
 	}
 
-	public Tutorial(GraphicsConfiguration gc) {
-		super(gc);
-		// TODO Auto-generated constructor stub
-	}
 
-	public Tutorial(String title) throws HeadlessException {
-		super(title);
-		// TODO Auto-generated constructor stub
-	}
 
-	public Tutorial(String title, GraphicsConfiguration gc) {
-		super(title, gc);
-		// TODO Auto-generated constructor stub
-	}
 
 }

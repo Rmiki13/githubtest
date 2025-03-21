@@ -4,24 +4,32 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Graphics;
 import java.awt.GraphicsConfiguration;
 import java.awt.GridLayout;
 import java.awt.HeadlessException;
+import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 public class Menu extends JFrame {
+	boolean przeciwnik_bot=true;
 	JPanel panel_centrum=new JPanel();
 	JPanel panel_gora=new JPanel();
 	JPanel panel_dol=new JPanel();
 	JPanel panel_prawo=new JPanel();
 	JPanel panel_lewo=new JPanel();
+	Image backgroundImage;
 	JButton guzik_wybor_przeciwnika,guzik_tutorial,guzik_jezyk,guzik_graj;
 	String[] tryby_gry = {"3+2", "15+10", "1+0"};
 	JComboBox<String> lista_trybow = new JComboBox<String>(tryby_gry);
@@ -29,9 +37,18 @@ public class Menu extends JFrame {
 		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		this.setSize(600,400);
 		this.setLayout(new BorderLayout());
-
+		
+		 backgroundImage = new ImageIcon("C:/Users/User/Desktop/Downloads/tlo.jpg").getImage();//nie chce sie ladowac obrazek
+		 JPanel backgroundPanel = new JPanel() {
+	            @Override
+	            protected void paintComponent(Graphics g) {
+	                super.paintComponent(g);
+	                g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
+	            }
+	        };
+		
 		Dimension buttonSize = new Dimension(120, 40);
-		guzik_wybor_przeciwnika=new JButton("Przeciwnik");
+		guzik_wybor_przeciwnika=new JButton("bot");
 		guzik_tutorial=new JButton("Tutorial");
 		guzik_graj=new JButton("Graj");
 		guzik_jezyk=new JButton("Jezyk polski");
@@ -66,11 +83,46 @@ public class Menu extends JFrame {
         panel_centrum.add(Box.createVerticalGlue());
         
         panel_lewo.add(guzik_jezyk);
-
+        
+        ActionListener ustaw_przeciwnika = new ActionListener() {
+        	@Override
+        	public void actionPerformed(ActionEvent arg0) {
+        		if(przeciwnik_bot==true) {
+        			przeciwnik_bot=false;
+        			guzik_wybor_przeciwnika.setText("gracz");
+        		}
+        		else {przeciwnik_bot=true;
+        		guzik_wybor_przeciwnika.setText("bot");
+        		}
+        				
+        	}	
+        };
+        guzik_wybor_przeciwnika.addActionListener(ustaw_przeciwnika);
+        
+        ActionListener przenies_do_tutorialu = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JOptionPane.showMessageDialog(null, "Przenoszę do tutorialu...");
+                new Tutorial();  // Otwiera nowe okno z tutorialem
+            }
+        };
+        guzik_tutorial.addActionListener(przenies_do_tutorialu);
+        
+        ActionListener zacznij_gre = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JOptionPane.showMessageDialog(null, "Przenoszę do tutorialu...");
+                new Gra();  // Otwiera nowe okno z tutorialem
+            }
+        };
+        guzik_graj.addActionListener(zacznij_gre);
+        
+        backgroundPanel.add(panel_centrum, BorderLayout.CENTER);
         this.add(panel_centrum, BorderLayout.CENTER);
         this.add(panel_gora, BorderLayout.PAGE_END);//przycisk zmien kolor
         this.add(panel_lewo, BorderLayout.WEST);//radioguziki
         this.add(panel_prawo, BorderLayout.EAST);//wartosc
+        
        
 	}
 
