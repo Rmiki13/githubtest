@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.GraphicsConfiguration;
 import java.awt.GridLayout;
@@ -152,6 +153,7 @@ public class Menu extends JFrame {
         
         //dodanie naglowka do menu
         JLabel naglowek = new JLabel("SZACHY");
+        naglowek.setFont(new Font("BOLD", Font.BOLD, 40));
         panel_gora.add(naglowek);
         //panel_gora.setBorder(BorderFactory.createTitledBorder("SZACHY")); wariant z ramka ale nie wiem jak wysrodkowac
         

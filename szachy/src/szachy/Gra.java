@@ -51,7 +51,7 @@ public class Gra extends JFrame {
 	    JLabel label = new JLabel("Tu będzie gra! (albo zegar)", SwingConstants.CENTER);
 	    top_panel.add(label);
 	    
-	    JLabel kartka = new JLabel("Tutaj będą się zapisywać ruchy?");
+	    JLabel kartka = new JLabel("Tutaj będą się zapisywać ruchy");
 	    right_panel.add(kartka);
 	    
 	    //dodanie paneli do ramki
