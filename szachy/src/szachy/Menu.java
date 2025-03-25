@@ -38,7 +38,10 @@ public class Menu extends JFrame {
 		this.setSize(600,400);
 		this.setLayout(new BorderLayout());
 		
-		 backgroundImage = new ImageIcon("C:/Users/User/Desktop/Downloads/tlo.jpg").getImage();//nie chce sie ladowac obrazek
+		
+		
+		
+		 backgroundImage = new ImageIcon("tlo.jpg").getImage();//nie chce sie ladowac obrazek
 		 JPanel backgroundPanel = new JPanel() {
 	            @Override
 	            protected void paintComponent(Graphics g) {
@@ -118,6 +121,8 @@ public class Menu extends JFrame {
         guzik_graj.addActionListener(zacznij_gre);
         
         backgroundPanel.add(panel_centrum, BorderLayout.CENTER);
+        this.add(backgroundPanel, BorderLayout.CENTER);  // Dodajemy backgroundPanel do ramki
+
         this.add(panel_centrum, BorderLayout.CENTER);
         this.add(panel_gora, BorderLayout.PAGE_END);//przycisk zmien kolor
         this.add(panel_lewo, BorderLayout.WEST);//radioguziki
