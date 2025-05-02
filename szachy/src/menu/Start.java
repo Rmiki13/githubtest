@@ -1,4 +1,4 @@
-package szachy;
+package menu;
 
 public class Start {
 
