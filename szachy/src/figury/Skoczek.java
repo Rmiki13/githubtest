@@ -1,11 +1,13 @@
 package figury;
 
 import gra.GamePanel;
+import gra.Typ;
 
 public class Skoczek extends figura {
 
 	public Skoczek(int kolor, int col, int row) {
 		super(kolor, col, row);
+		typ = Typ.SKOCZEK;
 		if(color==GamePanel.WHITE) {
 			image=getImage("/figury/w-knight");
 		}

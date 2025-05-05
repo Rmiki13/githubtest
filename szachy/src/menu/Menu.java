@@ -26,6 +26,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+
 public class Menu extends JFrame {
 	
 	//tworzenie nowych paneli do ramki
@@ -177,8 +178,7 @@ public class Menu extends JFrame {
 
 	public static void main(String[] args) {
 		Menu menu=new Menu();
-		menu.setVisible(true); //JAK CIE NIE URUCHAMIA TO USUN KOMENTARZ PRZED KOMENDA
-		// przenioslem ja do konstruktora na przyszlosc ale czasem cos mi nie chce dzialac otwiera sie puste okno
+		menu.setVisible(true);
 	}
 
 }

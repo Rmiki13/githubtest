@@ -12,6 +12,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
+import gra.GamePanel;
+
 public class Gra extends JFrame {
 
 	//konstruktor
@@ -19,33 +21,26 @@ public class Gra extends JFrame {
 		//podstawowe metody
 		setTitle("Gra");
 	    setSize(800, 600);
-	    setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-	    setLocationRelativeTo(null);
+	    setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	    setLocationRelativeTo(null);//wyswietla sie gra na srodku ekranu
 	    this.setVisible(true);
 	    this.setLayout(new BorderLayout());
 	    
+	    this.setResizable(false);//nie mozna rozciagac ekarnu
+		
+		GamePanel gp=new GamePanel();
+		this.add(gp, BorderLayout.CENTER);
+		this.pack();//dostosowuje sie window do rozmiaru gp
+		
+		gp.lunchgame();//wlacza watek gry
+	    
 	    //deklaracja paneli
 	    JPanel top_panel = new JPanel();
-	    JPanel left_panel = new JPanel();
-	    JPanel mid_panel = new JPanel();
+	    //JPanel left_panel = new JPanel();
 	    JPanel right_panel = new JPanel();
-	    JPanel bot_panel = new JPanel();
+	    //JPanel bot_panel = new JPanel();
 	    
-	    //szachownica
-	    mid_panel.setLayout(new GridLayout(8, 8));
 	    
-	    for(int i=1; i<=8; i++) {
-	    	for(int a=65; a<=72; a++) { //takie liczby z kodu ASCII zeby po kolei byly litery A-H
-	    		JButton button = new JButton((char)a + "" + i);
-	    		mid_panel.add(button);
-	    		button.setBorderPainted(false);// usuwa obramowania przyciskow
-	    		if((i+a)%2!=0) { //warunek na pomalowanie pol na czarno
-	    			button.setForeground(Color.white);
-	    			button.setBackground(Color.black);
-	    		}
-	    		button.setName("pole_"+(char)a+i); //zmienia nazwe przycisku na np. pole_A1
-	    	}
-	    }
 	    
 	    //naglowek
 	    JLabel label = new JLabel("Tu będzie gra! (albo zegar)", SwingConstants.CENTER);
@@ -56,7 +51,6 @@ public class Gra extends JFrame {
 	    
 	    //dodanie paneli do ramki
 	    this.add(top_panel, BorderLayout.PAGE_START);
-	    this.add(mid_panel, BorderLayout.CENTER);
 	    this.add(right_panel, BorderLayout.LINE_END);
 	}
 

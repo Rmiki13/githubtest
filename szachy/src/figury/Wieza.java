@@ -1,11 +1,13 @@
 package figury;
 
 import gra.GamePanel;
+import gra.Typ;
 
 public class Wieza extends figura {
 
 	public Wieza(int kolor, int col, int row) {
 		super(kolor, col, row);
+		typ = Typ.WIEZA;
 		
 		if(color==GamePanel.WHITE) {
 			image=getImage("/figury/w-rook");
