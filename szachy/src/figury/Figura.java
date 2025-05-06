@@ -10,16 +10,16 @@ import gra.GamePanel;
 import gra.Szachownica;
 import gra.Typ;
 
-public class figura {
+public class Figura {
 	public BufferedImage image;
 	public int x,y; //??????????
 	public int	col,row,preCol,preRow;
 	public int color;
-	public figura hittingP; //tworzenie instancji klasy wewn niej samej
+	public Figura hittingP; //tworzenie instancji klasy wewn niej samej
 	public boolean ruszony; //specjalna zmienna dla pionka by okreslic czy sie wczesniej ruszal, no i do roszady
 	public Typ typ;
 
-	public figura(int kolor,int col,int row) { //konstruktor
+	public Figura(int kolor,int col,int row) { //konstruktor
 	this.col=col;
 	this.color=kolor;
 	this.row=row;
@@ -32,7 +32,7 @@ public class figura {
 	public boolean pieceIsOnStraightLine(int targetCol,int targetRow) {
 		//ruch w lewo
 		for(int c=preCol-1;c>targetCol;c--) {
-			for(figura f:GamePanel.obecne_figury) {
+			for(Figura f:GamePanel.obecne_figury) {
 				if(f.col==c && f.row==targetRow) {
 					hittingP=f;
 					return true;
@@ -41,7 +41,7 @@ public class figura {
 		}
 		//ruch w prawo
 		for(int c=preCol+1;c<targetCol;c++) {
-			for(figura f:GamePanel.obecne_figury) {
+			for(Figura f:GamePanel.obecne_figury) {
 				if(f.col==c && f.row==targetRow) {
 					hittingP=f;
 					return true;
@@ -51,7 +51,7 @@ public class figura {
 		
 		//ruch w gore
 		for(int c=preRow-1;c>targetRow;c--) {
-			for(figura f:GamePanel.obecne_figury) {
+			for(Figura f:GamePanel.obecne_figury) {
 				if(f.col==targetCol && f.row==c) {
 					hittingP=f;
 					return true;
@@ -60,7 +60,7 @@ public class figura {
 		}
 		//ruch w dol 
 		for(int c=preCol+1;c<targetCol;c++) {
-			for(figura f:GamePanel.obecne_figury) {
+			for(Figura f:GamePanel.obecne_figury) {
 				if(f.col==targetCol && f.row==c) {
 					hittingP=f;
 					return true;
@@ -75,7 +75,7 @@ public class figura {
 				//gorne lewo
 				for(int c=preCol-1;c>targetCol;c--) {
 					int diff=Math.abs(c-preCol);
-					for(figura f:GamePanel.obecne_figury) {
+					for(Figura f:GamePanel.obecne_figury) {
 						if(f.col==c && f.row==preRow-diff) {
 							hittingP=f;
 							return true;
@@ -86,7 +86,7 @@ public class figura {
 				//gorne prawo
 				for(int c=preCol+1;c<targetCol;c++) {
 					int diff=Math.abs(c-preCol);
-					for(figura f:GamePanel.obecne_figury) {
+					for(Figura f:GamePanel.obecne_figury) {
 						if(f.col==c && f.row==preRow-diff) {
 							hittingP=f;
 							return true;
@@ -98,7 +98,7 @@ public class figura {
 				//dol lewo
 				for(int c=preCol-1;c>targetCol;c--) {
 					int diff=Math.abs(c-preCol);
-					for(figura f:GamePanel.obecne_figury) {
+					for(Figura f:GamePanel.obecne_figury) {
 						if(f.col==c && f.row==preRow+diff) {
 							hittingP=f;
 							return true;
@@ -109,7 +109,7 @@ public class figura {
 				//dol prawo
 				for(int c=preCol+1;c<targetCol;c++) {
 					int diff=Math.abs(c-preCol);
-					for(figura f:GamePanel.obecne_figury) {
+					for(Figura f:GamePanel.obecne_figury) {
 						if(f.col==c && f.row==preRow+diff) {
 							hittingP=f;
 							return true;
@@ -130,18 +130,18 @@ public class figura {
 		return image;
 	}
 	
-	public boolean isSameSquare(int targetCol,int targetRow) { //ten sam kwadrat ale patrzy na poprzedni? czy dziala to z konstruktora ze precol=col
+	public boolean isSameSquare(int targetCol,int targetRow) { 
 		if(targetCol==preCol&&targetRow==preRow) {
 			return true;
 		}	
 		return false;
 	}
 	
-	public int getX(int col) {//jak sie to liczy? lewy gorny rog kwadratu?
+	public int getX(int col) {// lewy gorny rog kwadratu
 		return col*Szachownica.SQUARE_SIZE;
 	}
 	
-	public int getIndex() {//petli sie po figurach az natrafi na ta na ktorej wywolana funkcja jest (co to ten index)?
+	public int getIndex() {//petli sie po figurach az natrafi na ta na ktorej wywolana funkcja jest
 		for(int index=0;index<GamePanel.obecne_figury.size();index++) {
 			if(GamePanel.obecne_figury.get(index)==this) {
 				return index;
@@ -150,11 +150,11 @@ public class figura {
 		return 0;
 	}
 	
-	public int getY(int row) {//tak samo jak getX()? lewy gorny rog kwadratu?
+	public int getY(int row) {// lewy gorny rog kwadratu
 		return row*Szachownica.SQUARE_SIZE;
 	}
 	
-	public int getCol(int x) {//przenosi nas na srodek kolumny i dzieli przez rozmiar kwadratu (potrzebne to przeniesienie?
+	public int getCol(int x) {//przenosi nas na srodek kolumny i dzieli przez rozmiar kwadratu
 		return(x+Szachownica.Half_SQUARE_SIZE)/Szachownica.SQUARE_SIZE;
 	}
 	
@@ -170,8 +170,8 @@ public class figura {
 		ruszony = true;//specjalna zmienna piona
 	}
 	
-	public figura getHittingP(int targetCol,int targetRow) {//czy cos trafi po wybraniu lokalizacji, petli sie na kazdej figurze sprawdzajac czy sie znajduje w podanej lokalizacji i czy nie jest nia sama
-		for(figura f:GamePanel.obecne_figury) {
+	public Figura getHittingP(int targetCol,int targetRow) {//czy cos trafi po wybraniu lokalizacji, petli sie na kazdej figurze sprawdzajac czy sie znajduje w podanej lokalizacji i czy nie jest nia sama
+		for(Figura f:GamePanel.obecne_figury) {
 			if(f.col==targetCol&&f.row==targetRow&&f!=this) {
 				return f;
 			}
@@ -195,11 +195,11 @@ public class figura {
 		return false;
 	}
 	
-	public boolean canMove(int targetCol,int targetRow) {//chyba cantMove ale po co to?????????????????
+	public boolean canMove(int targetCol,int targetRow) {//metoda do przeciazenia dla klas pochodnych
 		return false;
 	}
 	
-	public void resetPosition() {//resetuje na odwrot niz updatePosition() jakie to ma znaczenie?????????????????
+	public void resetPosition() {
 		col=preCol;
 		row=preRow;
 		x=getX(col);
@@ -215,7 +215,7 @@ public class figura {
 	}
 	
 	public void draw(Graphics2D g2) {
-		g2.drawImage(image, x, y,Szachownica.SQUARE_SIZE, Szachownica.SQUARE_SIZE,null);//obraz, x i y gornego lewego rogu, wysokosc i szerokosc obrazu, null nie wiem?????????????/
+		g2.drawImage(image, x, y,Szachownica.SQUARE_SIZE, Szachownica.SQUARE_SIZE,null);//obraz, x i y gornego lewego rogu, wysokosc i szerokosc obrazu
 	}
 
 }

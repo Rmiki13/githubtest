@@ -3,7 +3,7 @@ package figury;
 import gra.GamePanel;
 import gra.Typ;
 
-public class Krol extends figura {
+public class Krol extends Figura {
 
 	public Krol(int kolor, int col, int row) {
 		super(kolor, col, row);
@@ -28,7 +28,7 @@ public class Krol extends figura {
 			if(ruszony == false) {
 				
 				if(targetCol == preCol+2 && targetRow == preRow && pieceIsOnStraightLine(targetCol, targetRow) == false) {//w prawo
-					for(figura f : GamePanel.obecne_figury) {
+					for(Figura f : GamePanel.obecne_figury) {
 						if(f.col == preCol+3 && f.row == preRow && f.ruszony == false) {
 							GamePanel.roszadaP = f;
 							return true;
@@ -37,8 +37,8 @@ public class Krol extends figura {
 				}
 				
 				if(targetCol == preCol-2 && targetRow == preRow && pieceIsOnStraightLine(targetCol, targetRow) == false) {//w lewo
-					figura tmp[] = new figura[2];//w lewo jest o jedno pole wiecej wiec trzeba sprawdzic dodatkowe pole miedzy wieza a krolem
-					for(figura f : GamePanel.obecne_figury) {
+					Figura tmp[] = new Figura[2];//w lewo jest o jedno pole wiecej wiec trzeba sprawdzic dodatkowe pole miedzy wieza a krolem
+					for(Figura f : GamePanel.obecne_figury) {
 						if(f.col == preCol-3 && f.row == targetRow) {
 							tmp[0] = f;
 						}

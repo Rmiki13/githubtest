@@ -16,7 +16,9 @@ import figury.Krol;
 import figury.Pion;
 import figury.Skoczek;
 import figury.Wieza;
-import figury.figura;
+import menu.Gra;
+import menu.Menu;
+import figury.Figura;
 
 public class GamePanel extends JPanel	implements Runnable {
 	public static int WIDTH=1100;//MOZE BYC TEZ FINALE	jezeli moze byc to w takim razie chyba powinna byc to zmienna typu final
@@ -34,17 +36,17 @@ public class GamePanel extends JPanel	implements Runnable {
 	public static int BLACK=0;
 	int currentColor=WHITE;
 	//figury
-	public static ArrayList<figura>figury=new ArrayList<>();//lista figura na szachownicy wraz z  polozeniami
-	public static ArrayList<figura>obecne_figury=new ArrayList<>();//aktualizowana figur pozostalych na planszy
-	figura activeP, szachP;//klasa figura z paczki figury
-	public static figura roszadaP; //powinno byc chyba private z geterami i seterami
+	public static ArrayList<Figura>figury=new ArrayList<>();//lista figura na szachownicy wraz z  polozeniami
+	public static ArrayList<Figura>obecne_figury=new ArrayList<>();//aktualizowana figur pozostalych na planszy
+	Figura activeP, szachP;//klasa figura z paczki figury
+	public static Figura roszadaP; //powinno byc chyba private z geterami i seterami
 	//roszada zrobiona brakuje bicia w locie i awansow!!!!!!!!!!!!!!!
 	
 	public GamePanel() {//konstruktor
 		setPreferredSize(new Dimension(WIDTH,HEIGHT));
 		setBackground(Color.black);
-		setFigury();//?????????????
-		copyFigury(figury,obecne_figury);//????????????????
+		setFigury();
+		copyFigury(figury,obecne_figury);
 		addMouseMotionListener(mouse);//dodanie listenerow
 		addMouseListener(mouse);
 	}
@@ -60,7 +62,7 @@ public class GamePanel extends JPanel	implements Runnable {
 		if(koniecGry==false && pat==false) {
 			if(mouse.pressed) {
 				if(activeP==null)	{
-					for(figura f:obecne_figury) {
+					for(Figura f:obecne_figury) {
 						if(f.color==currentColor&&f.col==mouse.x/Szachownica.SQUARE_SIZE&&f.row==mouse.y/Szachownica.SQUARE_SIZE) {
 							activeP=f;
 						}
@@ -81,7 +83,6 @@ public class GamePanel extends JPanel	implements Runnable {
 						if(roszadaP != null) roszadaP.updatePosition(); //updejt polozenia figur bioracych udzial w roszadzie
 						
 						if(krolWSzachu() && szachMat()) {
-							//jakas akcje trzeba dodac
 							koniecGry = true;
 							String koniec ="";
 							if(currentColor==WHITE) {
@@ -91,7 +92,6 @@ public class GamePanel extends JPanel	implements Runnable {
 							}
 							JOptionPane.showMessageDialog(null, koniec);
 						}else if(krolWSzachu()){
-							//zmianaTury(); //zmiana gracza
 							System.out.println(szachP.typ + " " + szachP.col + " " + szachP.row);//sprawdzenie co powoduje niepozadanego szacha
 							String szach ="";
 							if(szachP.color==BLACK) {
@@ -148,12 +148,11 @@ public class GamePanel extends JPanel	implements Runnable {
 		super.paintComponent(g);
 		Graphics2D g2=(Graphics2D)g;
 		szachownica.draw(g2);
-		for(figura f:obecne_figury) {
+		for(Figura f:obecne_figury) {
 			f.draw(g2);
 		}
 		if(activeP!=null) {
 			if(canMove) {
-				//zrbic jak na lichess   ????????????????????????/
 				//tutaj hovereffect!!!!!!!!!!
 			}
 			activeP.draw(g2);
@@ -198,7 +197,7 @@ public class GamePanel extends JPanel	implements Runnable {
 			figury.add(new Krol(BLACK,4,0));
 		
 	}
-	private void copyFigury(ArrayList<figura> source,ArrayList<figura> target) {
+	private void copyFigury(ArrayList<Figura> source,ArrayList<Figura> target) {
 		target.clear();
 		for(int i=0;i<source.size();i++) {
 			target.add(source.get(i));
@@ -217,9 +216,9 @@ public class GamePanel extends JPanel	implements Runnable {
 		}
 	}
 	
-	private boolean krolNieBezpieczny(figura krol) {//sprawdza czy krol moze sie ruszyc w dane miejsce
+	private boolean krolNieBezpieczny(Figura krol) {//sprawdza czy krol moze sie ruszyc w dane miejsce
 		if(krol.typ == Typ.KROL) {
-			for(figura f : obecne_figury) {
+			for(Figura f : obecne_figury) {
 				if(f!=krol && f.color!=krol.color && f.canMove(krol.col, krol.row)) {
 					return true;
 				}
@@ -229,7 +228,7 @@ public class GamePanel extends JPanel	implements Runnable {
 	}
 	
 	private boolean krolWSzachu() {
-		figura krol = getKrol(true);//krol przeciwnika
+		Figura krol = getKrol(true);//krol przeciwnika
 		
 		if(activeP.canMove(krol.col, krol.row)) {
 			szachP = activeP;
@@ -241,9 +240,9 @@ public class GamePanel extends JPanel	implements Runnable {
 		return false;
 	}
 	
-	private figura getKrol(boolean przeciwnik) {//zwraca obiekt figura ktora jest krolem twoim(false) lub przeciwnika(true) potrzebne do metody krolWSzachu()
-		figura krol = null;
-		for(figura f: obecne_figury) {
+	private Figura getKrol(boolean przeciwnik) {//zwraca obiekt figura ktora jest krolem twoim(false) lub przeciwnika(true) potrzebne do metody krolWSzachu()
+		Figura krol = null;
+		for(Figura f: obecne_figury) {
 			if(przeciwnik) {
 				if(f.typ==Typ.KROL && f.color!=currentColor) {
 					krol=f;
@@ -258,8 +257,8 @@ public class GamePanel extends JPanel	implements Runnable {
 	}
 	
 	private boolean krolWNiebezpieczenstwie() {//sprawdzamy czy pionek przeciwnika moze ruszyc sie na pole na ktorym znajduje sie krol
-		figura krol = getKrol(false);//twoj krol
-		for(figura f: obecne_figury) {
+		Figura krol = getKrol(false);//twoj krol
+		for(Figura f: obecne_figury) {
 			if(f.color!=krol.color && f.canMove(krol.col, krol.row)) {
 				return true;
 			}
@@ -270,7 +269,7 @@ public class GamePanel extends JPanel	implements Runnable {
 	private boolean remis() {
 		int licznik=0;
 		
-		for(figura f:obecne_figury) {//liczenie obecnych figur na planszy
+		for(Figura f:obecne_figury) {//liczenie obecnych figur na planszy
 			if(f.color!=currentColor) {
 				licznik++;
 			}
@@ -287,7 +286,7 @@ public class GamePanel extends JPanel	implements Runnable {
 	
 	//SZACHMAT @#$%^&*&^%$#@#$%^&*!@#$%^&*(*&^%$#@#$%^&*&^%$#%^&^%$%^&*()(*(&^&^%$#@!(*&^%$#@
 	private boolean szachMat() {
-		figura krol = getKrol(true);//krol przeciwnika
+		Figura krol = getKrol(true);//krol przeciwnika
 		
 		if(krolMozeUciec(krol)) {//krol przeciwnika moze uciec
 			return false;
@@ -300,7 +299,7 @@ public class GamePanel extends JPanel	implements Runnable {
 			if(colDiff==0) {//atak z gory lub dolu
 				if(szachP.row < krol.row) {//atak z gory
 					for(int miejsce = szachP.row; miejsce < krol.row; miejsce++) {
-						for(figura f : obecne_figury) {
+						for(Figura f : obecne_figury) {
 							if(f!=krol && f.color!=currentColor && f.canMove(szachP.col, miejsce)) {
 								return false;
 							}
@@ -309,7 +308,7 @@ public class GamePanel extends JPanel	implements Runnable {
 				}
 				if(szachP.row > krol.row) {//atak z dolu
 					for(int miejsce = szachP.row; miejsce > krol.row; miejsce--) {
-						for(figura f : obecne_figury) {
+						for(Figura f : obecne_figury) {
 							if(f!=krol && f.color!=currentColor && f.canMove(szachP.col, miejsce)) {
 								return false;
 							}
@@ -319,7 +318,7 @@ public class GamePanel extends JPanel	implements Runnable {
 			}else if(rowDiff==0) {//atak z lewej lub prawej
 				if(szachP.col < krol.col) {//atak z lewej
 					for(int miejsce = szachP.col; miejsce < krol.col; miejsce++) {
-						for(figura f : obecne_figury) {
+						for(Figura f : obecne_figury) {
 							if(f!=krol && f.color!=currentColor && f.canMove(miejsce, szachP.row)) {
 								return false;
 							}
@@ -328,7 +327,7 @@ public class GamePanel extends JPanel	implements Runnable {
 				}
 				if(szachP.col > krol.col) {//atak z prawej
 					for(int miejsce = szachP.col; miejsce > krol.col; miejsce--) {
-						for(figura f : obecne_figury) {
+						for(Figura f : obecne_figury) {
 							if(f!=krol && f.color!=currentColor && f.canMove(miejsce, szachP.row)) {
 								return false;
 							}
@@ -339,7 +338,7 @@ public class GamePanel extends JPanel	implements Runnable {
 				if(szachP.row < krol.row) {//atak z gory
 					if(szachP.col < krol.col) {//atak lewa gora
 						for(int col = szachP.col, row = szachP.row; col < krol.col; col++, row++) {
-							for(figura f: obecne_figury) {
+							for(Figura f: obecne_figury) {
 								if(f!=krol && f.color!=currentColor && f.canMove(col, row)) {
 									return false;
 								}
@@ -348,7 +347,7 @@ public class GamePanel extends JPanel	implements Runnable {
 					}
 					if(szachP.col > krol.col) {//atak prawa gora
 						for(int col = szachP.col, row = szachP.row; col > krol.col; col--, row++) {
-							for(figura f: obecne_figury) {
+							for(Figura f: obecne_figury) {
 								if(f!=krol && f.color!=currentColor && f.canMove(col, row)) {
 									return false;
 								}
@@ -359,7 +358,7 @@ public class GamePanel extends JPanel	implements Runnable {
 				if(szachP.row > krol.row) {//atak z dolu
 					if(szachP.col < krol.col) {//atak lewy dol
 						for(int col = szachP.col, row = szachP.row; col < krol.col; col++, row--) {
-							for(figura f: obecne_figury) {
+							for(Figura f: obecne_figury) {
 								if(f!=krol && f.color!=currentColor && f.canMove(col, row)) {
 									return false;
 								}
@@ -368,7 +367,7 @@ public class GamePanel extends JPanel	implements Runnable {
 					}
 					if(szachP.col > krol.col) {//atak prawy dol
 						for(int col = szachP.col, row = szachP.row; col > krol.col; col--, row--) {
-							for(figura f: obecne_figury) {
+							for(Figura f: obecne_figury) {
 								if(f!=krol && f.color!=currentColor && f.canMove(col, row)) {
 									return false;
 								}
@@ -382,7 +381,7 @@ public class GamePanel extends JPanel	implements Runnable {
 		return true;
 	}
 	
-	private boolean krolMozeUciec(figura krol) {
+	private boolean krolMozeUciec(Figura krol) {
 		
 		if(czyMozliwyRatunek(krol, -1, -1)) return true;
 		if(czyMozliwyRatunek(krol, 0, -1)) return true;
@@ -396,7 +395,7 @@ public class GamePanel extends JPanel	implements Runnable {
 		return false;
 	}
 	
-	private boolean czyMozliwyRatunek(figura krol, int colPlus, int rowPlus) {
+	private boolean czyMozliwyRatunek(Figura krol, int colPlus, int rowPlus) {
 		boolean ratunek = false;
 		
 		krol.col += colPlus;//symuluje ruch krola zeby zobaczyc czy moge w dane pole przejsc

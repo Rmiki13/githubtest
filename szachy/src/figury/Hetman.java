@@ -3,7 +3,7 @@ package figury;
 import gra.GamePanel;
 import gra.Typ;
 
-public class Hetman extends figura {
+public class Hetman extends Figura {
 
 	public Hetman(int kolor, int col, int row) {
 		super(kolor, col, row);

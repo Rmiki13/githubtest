@@ -21,7 +21,7 @@ public class Gra extends JFrame {
 		//podstawowe metody
 		setTitle("Gra");
 	    setSize(800, 600);
-	    setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	    setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 	    setLocationRelativeTo(null);//wyswietla sie gra na srodku ekranu
 	    this.setVisible(true);
 	    this.setLayout(new BorderLayout());

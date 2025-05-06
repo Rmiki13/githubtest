@@ -3,7 +3,7 @@ package figury;
 import gra.GamePanel;
 import gra.Typ;
 
-public class Wieza extends figura {
+public class Wieza extends Figura {
 
 	public Wieza(int kolor, int col, int row) {
 		super(kolor, col, row);

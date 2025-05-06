@@ -7,6 +7,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
 import java.awt.GridLayout;
 import java.awt.HeadlessException;
@@ -14,7 +15,11 @@ import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.net.URL;
 
+import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -31,15 +36,15 @@ public class Menu extends JFrame {
 	
 	//tworzenie nowych paneli do ramki
 	boolean przeciwnik_bot=true;
-	JPanel panel_centrum=new JPanel();
 	JPanel panel_gora=new JPanel();
 	JPanel panel_dol=new JPanel();
 	JPanel panel_prawo=new JPanel();
 	JPanel panel_lewo=new JPanel();
+	JPanel backgroundPanel;
+	Gra gra = null;
 	
 	//importowanie obrazka
-	ImageIcon temporaryImage = new ImageIcon("tlo.jpg");
-	Image backgroundImage = temporaryImage.getImage();
+	private BufferedImage image;
 	
 	//deklaracja guzikow (4)
 	JButton guzik_wybor_przeciwnika, guzik_tutorial, guzik_jezyk, guzik_graj;
@@ -53,21 +58,31 @@ public class Menu extends JFrame {
 	//konstruktor
 	public Menu() throws HeadlessException {
 		//podstawowe metody
-		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		this.setSize(600,400);
 		this.setLayout(new BorderLayout());
 		this.setVisible(true);
 		setLocationRelativeTo(null); //okno pojawia sie na srodku ekranu
 		
-		 //W TEORII tworzenie nowego panelu ktorego tlem jest obrazek
+		URL resource = getClass().getResource("tlo.jpg");
+		try {
+			image=ImageIO.read(resource);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			System.err.println("Blad odczytu obrazka");
+			e.printStackTrace();
+		}
+		
+		 //tworzenie nowego panelu ktorego tlem jest obrazek
 		 JPanel backgroundPanel = new JPanel() {
 	            @Override
 	            protected void paintComponent(Graphics g) {
 	                super.paintComponent(g);
-	                g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
+	                Graphics2D g2d = (Graphics2D) g;
+	                g2d.drawImage(image, 0, 0, getWidth(), getHeight()+70, this);
 	            }
-	        };
-		
+	     };
+	        
 	        
 	    //definicja przeciwskow (4)
 		guzik_wybor_przeciwnika=new JButton("bot");
@@ -89,25 +104,25 @@ public class Menu extends JFrame {
         guzik_graj.setMaximumSize(buttonSize);
 
         // Ustawienie układu pionowego i wyśrodkowanie elementów
-        panel_centrum.setLayout(new BoxLayout(panel_centrum, BoxLayout.Y_AXIS));
-        panel_centrum.setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50));
+        backgroundPanel.setLayout(new BoxLayout(backgroundPanel, BoxLayout.Y_AXIS));
+        backgroundPanel.setBorder(BorderFactory.createEmptyBorder(20, 50, 20, 50));
         
         // Wysrodkowanie przyciskow (3)
-        panel_centrum.add(Box.createVerticalGlue()); // Dodaje przestrzeń na górze (wysrodkowanie wzgledem osi Y)
+        backgroundPanel.add(Box.createVerticalGlue()); // Dodaje przestrzeń na górze (wysrodkowanie wzgledem osi Y)
         lista_trybow.setAlignmentX(Component.CENTER_ALIGNMENT); //wysrodkowanie wzgledem osi X
         guzik_wybor_przeciwnika.setAlignmentX(Component.CENTER_ALIGNMENT);
         guzik_tutorial.setAlignmentX(Component.CENTER_ALIGNMENT);
         guzik_graj.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         //dodanie przyciskow i przestrzeni miedzy nimi (4)
-        panel_centrum.add(lista_trybow);
-        panel_centrum.add(Box.createRigidArea(new Dimension(0, 10))); // Odstęp
-        panel_centrum.add(guzik_wybor_przeciwnika);
-        panel_centrum.add(Box.createRigidArea(new Dimension(0, 10))); // Odstęp
-        panel_centrum.add(guzik_tutorial);
-        panel_centrum.add(Box.createRigidArea(new Dimension(0, 10))); // Odstęp
-        panel_centrum.add(guzik_graj);
-        panel_centrum.add(Box.createVerticalGlue());
+        backgroundPanel.add(lista_trybow);
+        backgroundPanel.add(Box.createRigidArea(new Dimension(0, 10))); // Odstęp
+        backgroundPanel.add(guzik_wybor_przeciwnika);
+        backgroundPanel.add(Box.createRigidArea(new Dimension(0, 10))); // Odstęp
+        backgroundPanel.add(guzik_tutorial);
+        backgroundPanel.add(Box.createRigidArea(new Dimension(0, 10))); // Odstęp
+        backgroundPanel.add(guzik_graj);
+        backgroundPanel.add(Box.createVerticalGlue());
         
         // dodanie do lewego przycisku guzika do zmiany jezyka
         panel_lewo.add(guzik_jezyk);
@@ -145,8 +160,11 @@ public class Menu extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 //JOptionPane.showMessageDialog(null, "Przenoszę do tutorialu...");//okienko posrednie miedzy menu a rozgrywka
-                new Gra();  // Otwiera nowe okno z rozgrywka
-                dispose(); //zamyka menu
+            	
+            	if(gra==null || !gra.isDisplayable()) {//sprawdza czy okno istnieje albo czy nie jest wyswietlane
+            		gra = new Gra(); // Otwiera nowe okno z rozgrywka
+            	}
+                //dispose(); //zamyka menu
                 //setVisible(false); //ukrywa menu, zamykajac okno z gra nie konczy programu
             }
         };
@@ -159,22 +177,12 @@ public class Menu extends JFrame {
         //panel_gora.setBorder(BorderFactory.createTitledBorder("SZACHY")); wariant z ramka ale nie wiem jak wysrodkowac
         
         //dodanie paneli do ramki
-        backgroundPanel.add(panel_centrum, BorderLayout.CENTER);
-        this.add(panel_centrum, BorderLayout.CENTER);
+        this.add(backgroundPanel, BorderLayout.CENTER);
         this.add(panel_gora, BorderLayout.PAGE_START);//przycisk zmien kolor
         this.add(panel_lewo, BorderLayout.WEST);//radioguziki
         this.add(panel_prawo, BorderLayout.EAST);//wartosc
         
-        
-        //Sprawdzanie czy obraz sie laduje
-    	if (backgroundImage == null) {
-    	    panel_centrum.setBackground(Color.red);
-    	} else {
-    		panel_centrum.setBackground(Color.blue);
-    	}
-    	
 	}
-
 
 	public static void main(String[] args) {
 		Menu menu=new Menu();

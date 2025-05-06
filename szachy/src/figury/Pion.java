@@ -3,7 +3,7 @@ package figury;
 import gra.GamePanel;
 import gra.Typ;
 
-public class Pion extends figura {
+public class Pion extends Figura {
 
 	public Pion(int kolor, int col, int row) {
 		super(kolor, col, row);
