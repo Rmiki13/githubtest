@@ -15,10 +15,15 @@ import javax.swing.SwingConstants;
 import gra.GamePanel;
 
 public class Gra extends JFrame {
-
+	private int czasWGrze;
+    private int dodawanyCzasNaRuch;
+    private boolean czyBot;
 	//konstruktor
-	public Gra() throws HeadlessException {
+	public Gra(int czasWGrze, int dodawanyCzas, boolean przeciwnikBot,boolean czy_horda) throws HeadlessException {
 		//podstawowe metody
+		this.czasWGrze = czasWGrze;
+        this.dodawanyCzasNaRuch = dodawanyCzas;
+        this.czyBot = przeciwnikBot;
 		setTitle("Gra");
 	    setSize(800, 600);
 	    setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -28,7 +33,7 @@ public class Gra extends JFrame {
 	    
 	    this.setResizable(false);//nie mozna rozciagac ekarnu
 		
-		GamePanel gp=new GamePanel();
+		GamePanel gp=new GamePanel(czasWGrze,dodawanyCzas,przeciwnikBot,czy_horda );
 		this.add(gp, BorderLayout.CENTER);
 		this.pack();//dostosowuje sie window do rozmiaru gp
 		

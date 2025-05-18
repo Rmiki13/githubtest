@@ -14,7 +14,14 @@ import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
 
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -45,7 +52,7 @@ public class Menu extends JFrame {
 	JButton guzik_wybor_przeciwnika, guzik_tutorial, guzik_jezyk, guzik_graj;
 	
 	//tablica stringow do przycisku do wyboru trybu
-	String[] tryby_gry = {"3+2", "15+10", "1+0"};
+	String[] tryby_gry = {"3+2", "15+10", "1+0","horda"};
 	
 	//lista wyboru trybu gry
 	JComboBox<String> lista_trybow = new JComboBox<String>(tryby_gry);
@@ -145,10 +152,33 @@ public class Menu extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 //JOptionPane.showMessageDialog(null, "Przenoszę do tutorialu...");//okienko posrednie miedzy menu a rozgrywka
-                new Gra();  // Otwiera nowe okno z rozgrywka
-                dispose(); //zamyka menu
-                //setVisible(false); //ukrywa menu, zamykajac okno z gra nie konczy programu
-            }
+            	String wybranyTryb = (String) lista_trybow.getSelectedItem();
+            	int czasStartowy;
+            	int czasDodawany;
+            	boolean czy_horda;
+            	if(wybranyTryb=="horda") {
+            		czasStartowy=600;
+            		czasDodawany=32;
+            		czy_horda=true;
+            		
+            		
+                }
+            	else {
+           		 czasStartowy = parseCzasMinuty(wybranyTryb) * 60; // w sekundach
+               	 czasDodawany = parseCzasDodawanySekundy(wybranyTryb); // w sekundach
+               	 czy_horda=false;
+           	}
+            	new Gra(czasStartowy, czasDodawany, przeciwnik_bot,czy_horda);
+                // Otwiera nowe okno z rozgrywka
+                  dispose(); //zamyka menu
+        		
+                  //setVisible(false); //ukrywa menu, zamykajac okno z gra nie konczy programu
+            	}
+            	
+            	
+
+            	
+            
         };
         guzik_graj.addActionListener(zacznij_gre);
         
@@ -157,7 +187,7 @@ public class Menu extends JFrame {
         naglowek.setFont(new Font("BOLD", Font.BOLD, 40));
         panel_gora.add(naglowek);
         //panel_gora.setBorder(BorderFactory.createTitledBorder("SZACHY")); wariant z ramka ale nie wiem jak wysrodkowac
-        
+       
         //dodanie paneli do ramki
         backgroundPanel.add(panel_centrum, BorderLayout.CENTER);
         this.add(panel_centrum, BorderLayout.CENTER);
@@ -173,6 +203,15 @@ public class Menu extends JFrame {
     		panel_centrum.setBackground(Color.blue);
     	}
     	
+	}
+	public static int parseCzasMinuty(String tryb) {
+	    String[] czesci = tryb.split("\\+");
+	    return Integer.parseInt(czesci[0]); // np. "3" z "3+0"
+	}
+
+	public static int parseCzasDodawanySekundy(String tryb) {
+	    String[] czesci = tryb.split("\\+");
+	    return Integer.parseInt(czesci[1]); // np. "0" z "3+0"
 	}
 
 

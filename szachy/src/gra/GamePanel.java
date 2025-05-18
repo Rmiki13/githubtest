@@ -1,14 +1,24 @@
 package gra;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.LayoutManager;
 import java.util.ArrayList;
 
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.Timer;
 
 import figury.Goniec;
 import figury.Hetman;
@@ -17,15 +27,28 @@ import figury.Pion;
 import figury.Skoczek;
 import figury.Wieza;
 import figury.figura;
-
+import menu.Menu;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
+import java.awt.event.ActionEvent;
 public class GamePanel extends JPanel	implements Runnable {
-	public static int WIDTH=1100;//MOZE BYC TEZ FINALE	jezeli moze byc to w takim razie chyba powinna byc to zmienna typu final
-	public static int HEIGHT=800;
+	public static int WIDTH=1500;//MOZE BYC TEZ FINALE	jezeli moze byc to w takim razie chyba powinna byc to zmienna typu final 1100
+	public static int HEIGHT=900;//800
 	int FPS=60;
 	boolean canMove;
 	boolean validSquare;
 	boolean koniecGry;
 	boolean pat;
+	//
+	private int whiteTime; // 5 minut = 300 sekund
+	private int blackTime;
+	private int dodawanyCzas;
+	private  boolean przeciwnikBot;
+	private  boolean czy_horda;
+	private Timer timer;
+	private boolean isWhiteTurn = true;
+	//
 	Thread gameThread; //watek
 	Szachownica szachownica=new Szachownica(); //klasa w paczce
 	Mouse mouse=new Mouse(); //klasa w paczce
@@ -40,7 +63,10 @@ public class GamePanel extends JPanel	implements Runnable {
 	public static figura roszadaP; //powinno byc chyba private z geterami i seterami
 	//roszada zrobiona brakuje bicia w locie i awansow!!!!!!!!!!!!!!!
 	
-	public GamePanel() {//konstruktor
+	public GamePanel(int czasWGrze, int dodawanyCzas, boolean przeciwnikBot,boolean czy_horda) {//konstruktor
+		this.whiteTime=this.blackTime=czasWGrze;
+		this.dodawanyCzas=dodawanyCzas;
+		this.przeciwnikBot=przeciwnikBot;
 		setPreferredSize(new Dimension(WIDTH,HEIGHT));
 		setBackground(Color.black);
 		setFigury();//?????????????
@@ -52,9 +78,32 @@ public class GamePanel extends JPanel	implements Runnable {
 	public void lunchgame() {//definicja watku i jego wystartowanie
 		gameThread=new Thread(this);
 		gameThread.start();
+		  startClock();
 		
 	}
+	//
 	
+	private void startClock() {
+	    timer = new Timer(1000, new ActionListener() {
+	        @Override
+	        public void actionPerformed(ActionEvent e) {
+	            if (isWhiteTurn) {
+	                whiteTime--;
+	                if (whiteTime <= 0) {
+	                    endGame("Czas białych się skończył!");
+	                }
+	            } else {
+	                blackTime--;
+	                if (blackTime <= 0) {
+	                    endGame("Czas czarnych się skończył!");
+	                }
+	            }
+	            repaint(); // odśwież panel
+	        }
+	    });
+	    timer.start();
+	}
+	//
 	private void update() {
 		
 		if(koniecGry==false && pat==false) {
@@ -77,6 +126,11 @@ public class GamePanel extends JPanel	implements Runnable {
 				if(activeP!=null) {
 					if(validSquare) {//potwierdzenie ze ruch jest legalny
 						copyFigury(obecne_figury,figury);//updejt listy figur jesli cos jest  zbite
+						if(currentColor==WHITE) {
+							whiteTime+=dodawanyCzas;
+						}else {
+							blackTime+=dodawanyCzas;
+						}
 						activeP.updatePosition();
 						if(roszadaP != null) roszadaP.updatePosition(); //updejt polozenia figur bioracych udzial w roszadzie
 						
@@ -157,45 +211,146 @@ public class GamePanel extends JPanel	implements Runnable {
 				//tutaj hovereffect!!!!!!!!!!
 			}
 			activeP.draw(g2);
+			
 		}
-		
+		g2.setFont(new Font("Arial", Font.BOLD, 18));
+		g2.setColor(Color.WHITE);
+		g2.drawString("Białe: " + formatTime(whiteTime), 800, 50);
+		g2.setColor(Color.WHITE);
+		g2.drawString("Czarne: " + formatTime(blackTime), 800 , 70);
 		
 	}
-	
+	private String formatTime(int totalSeconds) {
+	    int minutes = totalSeconds / 60;
+	    int seconds = totalSeconds % 60;
+	    return String.format("%02d:%02d", minutes, seconds);
+	}
+	private void endGame(String message) {
+	    timer.stop();
+	    JOptionPane.showMessageDialog(this, message);
+	    koniecGry = true;
+	}
 		public void setFigury() {
-			figury.add(new Pion(WHITE,0,6));
-			figury.add(new Pion(WHITE,1,6));
-			figury.add(new Pion(WHITE,2,6));
-			figury.add(new Pion(WHITE,3,6));
-			figury.add(new Pion(WHITE,4,6));
-			figury.add(new Pion(WHITE,5,6));
-			figury.add(new Pion(WHITE,6,6));
-			figury.add(new Pion(WHITE,7,6));
-			figury.add(new Skoczek(WHITE,1,7));
-			figury.add(new Skoczek(WHITE,6,7));
-			figury.add(new Wieza(WHITE,0,7));
-			figury.add(new Wieza(WHITE,7,7));
-			figury.add(new Goniec(WHITE,2,7));
-			figury.add(new Goniec(WHITE,5,7));
-			figury.add(new Hetman(WHITE,3,7));
-			figury.add(new Krol(WHITE,4,7));
+			if(czy_horda=false) {
+				
+				figury.add(new Pion(WHITE,0,6));
+				figury.add(new Pion(WHITE,1,6));
+				figury.add(new Pion(WHITE,2,6));
+				figury.add(new Pion(WHITE,3,6));
+				figury.add(new Pion(WHITE,4,6));
+				figury.add(new Pion(WHITE,5,6));
+				figury.add(new Pion(WHITE,6,6));
+				figury.add(new Pion(WHITE,7,6));
+				figury.add(new Skoczek(WHITE,1,7));
+				figury.add(new Skoczek(WHITE,6,7));
+				figury.add(new Wieza(WHITE,0,7));
+				figury.add(new Wieza(WHITE,7,7));
+				figury.add(new Goniec(WHITE,2,7));
+				figury.add(new Goniec(WHITE,5,7));
+				figury.add(new Hetman(WHITE,3,7));
+				figury.add(new Krol(WHITE,4,7));
+				
+				figury.add(new Pion(BLACK,0,1));
+				figury.add(new Pion(BLACK,1,1));
+				figury.add(new Pion(BLACK,2,1));
+				figury.add(new Pion(BLACK,3,1));
+				figury.add(new Pion(BLACK,4,1));
+				figury.add(new Pion(BLACK,5,1));
+				figury.add(new Pion(BLACK,6,1));
+				figury.add(new Pion(BLACK,7,1));
+				figury.add(new Skoczek(BLACK,1,0));
+				figury.add(new Skoczek(BLACK,6,0));
+				figury.add(new Wieza(BLACK,0,0));
+				figury.add(new Wieza(BLACK,7,0));
+				figury.add(new Goniec(BLACK,2,0));
+				figury.add(new Goniec(BLACK,5,0));
+				figury.add(new Hetman(BLACK,3,0));
+				figury.add(new Krol(BLACK,4,0));
+			}
+			if(czy_horda=true){
+				figury.add(new Pion(WHITE,0,6));
+				figury.add(new Pion(WHITE,1,6));
+				figury.add(new Pion(WHITE,2,6));
+				figury.add(new Pion(WHITE,3,6));
+				figury.add(new Pion(WHITE,4,6));
+				figury.add(new Pion(WHITE,5,6));
+				figury.add(new Pion(WHITE,6,6));
+				figury.add(new Pion(WHITE,7,6));
+				figury.add(new Skoczek(WHITE,1,7));
+				figury.add(new Skoczek(WHITE,6,7));
+				figury.add(new Wieza(WHITE,0,7));
+				figury.add(new Wieza(WHITE,7,7));
+				figury.add(new Goniec(WHITE,2,7));
+				figury.add(new Goniec(WHITE,5,7));
+				figury.add(new Hetman(WHITE,3,7));
+				figury.add(new Krol(WHITE,4,7));
+				
+				figury.add(new Skoczek(BLACK,0,1));
+				figury.add(new Skoczek(BLACK,1,1));
+				figury.add(new Skoczek(BLACK,2,1));
+				figury.add(new Skoczek(BLACK,3,1));
+				figury.add(new Skoczek(BLACK,4,1));
+				figury.add(new Skoczek(BLACK,5,1));
+				figury.add(new Skoczek(BLACK,6,1));
+				figury.add(new Skoczek(BLACK,7,1));
+				figury.add(new Skoczek(BLACK,0,2));
+				figury.add(new Skoczek(BLACK,1,2));
+				figury.add(new Skoczek(BLACK,2,2));
+				figury.add(new Skoczek(BLACK,3,2));
+				figury.add(new Skoczek(BLACK,4,2));
+				figury.add(new Skoczek(BLACK,5,2));
+				figury.add(new Skoczek(BLACK,6,2));
+				figury.add(new Skoczek(BLACK,7,2));
+				figury.add(new Skoczek(BLACK,0,3));
+				figury.add(new Skoczek(BLACK,1,3));
+				figury.add(new Skoczek(BLACK,2,3));
+				figury.add(new Skoczek(BLACK,3,3));
+				figury.add(new Skoczek(BLACK,4,3));
+				figury.add(new Skoczek(BLACK,5,3));
+				figury.add(new Skoczek(BLACK,6,3));
+				figury.add(new Skoczek(BLACK,7,3));
+				figury.add(new Skoczek(BLACK,0,4));
+				figury.add(new Skoczek(BLACK,1,4));
+				figury.add(new Skoczek(BLACK,2,4));
+				figury.add(new Skoczek(BLACK,3,4));
+				figury.add(new Skoczek(BLACK,4,4));
+				figury.add(new Skoczek(BLACK,5,4));
+				figury.add(new Skoczek(BLACK,6,4));
+				figury.add(new Skoczek(BLACK,7,4));
+				figury.add(new Skoczek(BLACK,0,0));
+				figury.add(new Skoczek(BLACK,1,0));
+				figury.add(new Skoczek(BLACK,2,0));
+				figury.add(new Skoczek(BLACK,3,0));
+				figury.add(new Skoczek(BLACK,5,0));
+				figury.add(new Skoczek(BLACK,6,0));
+				figury.add(new Skoczek(BLACK,7,0));
+				figury.add(new Krol(BLACK,4,0));
+				Thread muzykaWatek = new Thread(new Runnable() {
+				    @Override
+				    public void run() {
+				        try {
+				        	 ImageIcon obrazek = new ImageIcon("src/menu/meme.png"); // ścieżka względna lub bezwzględna
+				             JLabel labelZObrazkiem = new JLabel(obrazek);
+
+				             // Dodaj obrazek do panelu
+				             add(labelZObrazkiem, BorderLayout.EAST); 
+				            File soundFile = new File("src/menu/muzyka.wav");
+				            AudioInputStream audioIn = AudioSystem.getAudioInputStream(soundFile);
+				            Clip clip = AudioSystem.getClip();
+				            clip.open(audioIn);
+				            clip.start();
+
+				            // Jeśli chcesz zapętlić:
+				            // clip.loop(Clip.LOOP_CONTINUOUSLY);
+
+				        } catch (Exception ex) {
+				            ex.printStackTrace();
+				        }
+				    }
+				});
+				muzykaWatek.start();
+			}
 			
-			figury.add(new Pion(BLACK,0,1));
-			figury.add(new Pion(BLACK,1,1));
-			figury.add(new Pion(BLACK,2,1));
-			figury.add(new Pion(BLACK,3,1));
-			figury.add(new Pion(BLACK,4,1));
-			figury.add(new Pion(BLACK,5,1));
-			figury.add(new Pion(BLACK,6,1));
-			figury.add(new Pion(BLACK,7,1));
-			figury.add(new Skoczek(BLACK,1,0));
-			figury.add(new Skoczek(BLACK,6,0));
-			figury.add(new Wieza(BLACK,0,0));
-			figury.add(new Wieza(BLACK,7,0));
-			figury.add(new Goniec(BLACK,2,0));
-			figury.add(new Goniec(BLACK,5,0));
-			figury.add(new Hetman(BLACK,3,0));
-			figury.add(new Krol(BLACK,4,0));
 		
 	}
 	private void copyFigury(ArrayList<figura> source,ArrayList<figura> target) {
@@ -419,6 +574,11 @@ public class GamePanel extends JPanel	implements Runnable {
 	private void zmianaTury() {
 		currentColor = (currentColor == WHITE) ? BLACK : WHITE;
 		activeP = null;
+		
+		    
+		    isWhiteTurn = (currentColor == WHITE);//dodane
+		   
+		
 	}
 	
 	@Override
