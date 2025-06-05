@@ -52,7 +52,7 @@ public class Menu extends JFrame {
 	JButton guzik_wybor_przeciwnika, guzik_tutorial, guzik_jezyk, guzik_graj;
 	
 	//tablica stringow do przycisku do wyboru trybu
-	String[] tryby_gry = {"3+2", "15+10", "1+0","horda"};
+	String[] tryby_gry = {"3+2", "15+10", "1+0","mongolska inwazja"};
 	
 	//lista wyboru trybu gry
 	JComboBox<String> lista_trybow = new JComboBox<String>(tryby_gry);
@@ -77,7 +77,7 @@ public class Menu extends JFrame {
 		
 	        
 	    //definicja przeciwskow (4)
-		guzik_wybor_przeciwnika=new JButton("bot");
+		guzik_wybor_przeciwnika=new JButton("bot vs bot");
 		guzik_tutorial=new JButton("Tutorial");
 		guzik_graj=new JButton("Graj");
 		guzik_jezyk=new JButton("Jezyk polski");
@@ -125,10 +125,10 @@ public class Menu extends JFrame {
         	public void actionPerformed(ActionEvent arg0) {
         		if(przeciwnik_bot==true) {
         			przeciwnik_bot=false;
-        			guzik_wybor_przeciwnika.setText("gracz");
+        			guzik_wybor_przeciwnika.setText("gracz vs gracz");
         		}
         		else {przeciwnik_bot=true;
-        		guzik_wybor_przeciwnika.setText("bot");
+        		guzik_wybor_przeciwnika.setText("bot vs bot");
         		}
         				
         	}	
@@ -156,11 +156,10 @@ public class Menu extends JFrame {
             	int czasStartowy;
             	int czasDodawany;
             	boolean czy_horda;
-            	if(wybranyTryb=="horda") {
+            	if("mongolska inwazja".equals(wybranyTryb)) {
             		czasStartowy=600;
             		czasDodawany=32;
             		czy_horda=true;
-            		
             		
                 }
             	else {
@@ -175,10 +174,10 @@ public class Menu extends JFrame {
                   //setVisible(false); //ukrywa menu, zamykajac okno z gra nie konczy programu
             	}
             	
-            	
+            //	
 
             	
-            
+            //
         };
         guzik_graj.addActionListener(zacznij_gre);
         
