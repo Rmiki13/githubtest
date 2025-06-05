@@ -1,13 +1,19 @@
 package gra;
 
 import java.awt.BorderLayout;
+import java.awt.FlowLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.LayoutManager;
+import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
 
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
@@ -41,6 +47,7 @@ public class GamePanel extends JPanel	implements Runnable {
 	boolean koniecGry;
 	boolean pat;
 	//
+	
 	private int whiteTime; // 5 minut = 300 sekund
 	private int blackTime;
 	private int dodawanyCzas;
@@ -48,6 +55,7 @@ public class GamePanel extends JPanel	implements Runnable {
 	private  boolean czy_horda;
 	private Timer timer;
 	private boolean isWhiteTurn = true;
+	private Random random = new Random();
 	//
 	Thread gameThread; //watek
 	Szachownica szachownica=new Szachownica(); //klasa w paczce
@@ -64,9 +72,11 @@ public class GamePanel extends JPanel	implements Runnable {
 	//roszada zrobiona brakuje bicia w locie i awansow!!!!!!!!!!!!!!!
 	
 	public GamePanel(int czasWGrze, int dodawanyCzas, boolean przeciwnikBot,boolean czy_horda) {//konstruktor
+		this.  setLayout(new BorderLayout());
 		this.whiteTime=this.blackTime=czasWGrze;
 		this.dodawanyCzas=dodawanyCzas;
 		this.przeciwnikBot=przeciwnikBot;
+		this.czy_horda=czy_horda;
 		setPreferredSize(new Dimension(WIDTH,HEIGHT));
 		setBackground(Color.black);
 		setFigury();//?????????????
@@ -78,11 +88,8 @@ public class GamePanel extends JPanel	implements Runnable {
 	public void lunchgame() {//definicja watku i jego wystartowanie
 		gameThread=new Thread(this);
 		gameThread.start();
-		  startClock();
-		
+		  startClock();		
 	}
-	//
-	
 	private void startClock() {
 	    timer = new Timer(1000, new ActionListener() {
 	        @Override
@@ -104,8 +111,165 @@ public class GamePanel extends JPanel	implements Runnable {
 	    timer.start();
 	}
 	//
-	private void update() {
-		
+	private void update1() {
+	    if (!koniecGry && !pat) {
+	        Collections.shuffle(obecne_figury);
+	        for (figura f : obecne_figury) {
+	        	if(validSquare==false) {
+	        		 for (figura f1 : obecne_figury) {
+	        			 if (f1.typ == Typ.KROL) {
+	        				 if (f1.color == currentColor) {  // tylko figury obecnego gracza
+	        		                for (int targetRow = 0; targetRow < 8; targetRow++) {
+	        		                    for (int targetCol = 0; targetCol < 8; targetCol++) {
+	        		                        if (f1.canMove(targetCol, targetRow)) {  // jeśli ruch jest możliwy
+	        		                            // Przygotuj symulację ruchu jak w simulate()
+	        		                            copyFigury(figury, obecne_figury); // zapisz obecny stan
+	        		                            activeP = f1;
+
+	        		                            // Ustaw pozycję tymczasowo
+	        		                            activeP.col = targetCol;
+	        		                            activeP.row = targetRow;
+	        		                            activeP.x = activeP.getX(targetCol);
+	        		                            activeP.y = activeP.getY(targetRow);
+
+	        		                            // Cofnij roszadę jeśli była
+	        		                            if (roszadaP != null) {
+	        		                                roszadaP.col = roszadaP.preCol;
+	        		                                roszadaP.x = roszadaP.getX(roszadaP.col);
+	        		                                roszadaP = null;
+	        		                            }
+
+	        		                            canMove = true;
+	        		                            validSquare = true;
+
+
+	        		                                // Usunięcie bicia, jeśli występuje
+	        		                                if (activeP.hittingP != null) {
+	        		                                    obecne_figury.remove(activeP.hittingP.getIndex());
+	        		                                }
+
+	        		                                sprawdzRoszade();
+	        		                                try { Thread.sleep(300); } catch (InterruptedException e) { e.printStackTrace(); }
+
+	        		                                // Wykonaj ruch (jak w update())
+	        		                                copyFigury(obecne_figury, figury);
+	        		                                if (currentColor == WHITE) {
+	        		                                    whiteTime += dodawanyCzas;
+	        		                                } else {
+	        		                                    blackTime += dodawanyCzas;
+	        		                                }
+
+	        		                                activeP.updatePosition();
+	        		                                if (roszadaP != null) roszadaP.updatePosition();
+
+	        		                                // Sprawdź zakończenie gry
+	        		                                if (krolWSzachu() && szachMat()) {
+	        		                                    koniecGry = true;
+	        		                                    String koniec = currentColor == WHITE ? "Gracz bialych wygrywa!!!" : "Gracz czarnych wygrywa!!!";
+	        		                                    JOptionPane.showMessageDialog(null, koniec);
+	        		                                } else if (krolWSzachu()) {
+	        		                                    System.out.println(szachP.typ + " " + szachP.col + " " + szachP.row);
+	        		                                    String szach = szachP.color == BLACK ?
+	        		                                            "gracz bialych jest pod szachem" :
+	        		                                            "gracz czarnych jest pod szachem";
+	        		                                    JOptionPane.showMessageDialog(null, szach, "Szach", JOptionPane.WARNING_MESSAGE);
+	        		                                } else if (remis()) {
+	        		                                    pat = true;
+	        		                                    JOptionPane.showMessageDialog(null, "Pat");
+	        		                                }
+
+	        		                                zmianaTury(); // zakończenie ruchu
+	        		                                activeP = null; // wyczyść aktywną figurę
+	        		                                return; // zakończ metodę po pierwszym ruchu
+	        		                            }
+	        		                            else {
+	        		                            	
+	        		                            }
+	        		                        }
+	        		                    }
+	        		                }
+	        		            }
+	        				}
+	        		 }
+	        	
+	            if (f.color == currentColor) {  // tylko figury obecnego gracza
+	                for (int targetRow = 0; targetRow < 8; targetRow++) {
+	                    for (int targetCol = 0; targetCol < 8; targetCol++) {
+	                        if (f.canMove(targetCol, targetRow)) {  // jeśli ruch jest możliwy
+	                            // Przygotuj symulację ruchu jak w simulate()
+	                            copyFigury(figury, obecne_figury); // zapisz obecny stan
+	                            activeP = f;
+
+	                            // Ustaw pozycję tymczasowo
+	                            activeP.col = targetCol;
+	                            activeP.row = targetRow;
+	                            activeP.x = activeP.getX(targetCol);
+	                            activeP.y = activeP.getY(targetRow);
+
+	                            // Cofnij roszadę jeśli była
+	                            if (roszadaP != null) {
+	                                roszadaP.col = roszadaP.preCol;
+	                                roszadaP.x = roszadaP.getX(roszadaP.col);
+	                                roszadaP = null;
+	                            }
+
+	                            canMove = true;
+	                            validSquare = false;
+
+	                            if (!krolNieBezpieczny(activeP) && !krolWNiebezpieczenstwie()) {
+	                                validSquare = true;
+
+	                                // Usunięcie bicia, jeśli występuje
+	                                if (activeP.hittingP != null) {
+	                                    obecne_figury.remove(activeP.hittingP.getIndex());
+	                                }
+
+	                                sprawdzRoszade();
+	                                try { Thread.sleep(300); } catch (InterruptedException e) { e.printStackTrace(); }
+
+	                                // Wykonaj ruch (jak w update())
+	                                copyFigury(obecne_figury, figury);
+	                                if (currentColor == WHITE) {
+	                                    whiteTime += dodawanyCzas;
+	                                } else {
+	                                    blackTime += dodawanyCzas;
+	                                }
+
+	                                activeP.updatePosition();
+	                                if (roszadaP != null) roszadaP.updatePosition();
+
+	                                // Sprawdź zakończenie gry
+	                                if (krolWSzachu() && szachMat()) {
+	                                    koniecGry = true;
+	                                    String koniec = currentColor == WHITE ? "Gracz bialych wygrywa!!!" : "Gracz czarnych wygrywa!!!";
+	                                    JOptionPane.showMessageDialog(null, koniec);
+	                                } else if (krolWSzachu()) {
+	                                    System.out.println(szachP.typ + " " + szachP.col + " " + szachP.row);
+	                                    String szach = szachP.color == BLACK ?
+	                                            "gracz bialych jest pod szachem" :
+	                                            "gracz czarnych jest pod szachem";
+	                                    JOptionPane.showMessageDialog(null, szach, "Szach", JOptionPane.WARNING_MESSAGE);
+	                                } else if (remis()) {
+	                                    pat = true;
+	                                    JOptionPane.showMessageDialog(null, "Pat");
+	                                }
+
+	                                zmianaTury(); // zakończenie ruchu
+	                                activeP = null; // wyczyść aktywną figurę
+	                                return; // zakończ metodę po pierwszym ruchu
+	                            }
+	                            else {
+	                            	
+	                            }
+	                        }
+	                    }
+	                }
+	            }
+	        }
+	    }
+	}
+
+		private void update() {
 		if(koniecGry==false && pat==false) {
 			if(mouse.pressed) {
 				if(activeP==null)	{
@@ -159,6 +323,7 @@ public class GamePanel extends JPanel	implements Runnable {
 							JOptionPane.showMessageDialog(null, "Pat");
 						}
 						zmianaTury(); //zmiana gracza
+						
 					}
 					else {
 						//ruch jest zabroniony wiec wszystko wraca na poczatek
@@ -171,7 +336,8 @@ public class GamePanel extends JPanel	implements Runnable {
 		}
 	}
 	
-	private void simulate() {
+	
+private void simulate() {
 		canMove=false;
 		validSquare=false;
 		copyFigury(figury,obecne_figury);//jesli ruch jest niemozliwy to tzeba przechowac stara pozycje
@@ -196,8 +362,8 @@ public class GamePanel extends JPanel	implements Runnable {
 			sprawdzRoszade();
 		}
 	}	
-	
-	
+
+
 	public void 	paintComponent(Graphics g) {
 		super.paintComponent(g);
 		Graphics2D g2=(Graphics2D)g;
@@ -231,7 +397,7 @@ public class GamePanel extends JPanel	implements Runnable {
 	    koniecGry = true;
 	}
 		public void setFigury() {
-			if(czy_horda=false) {
+			if(!czy_horda) {
 				
 				figury.add(new Pion(WHITE,0,6));
 				figury.add(new Pion(WHITE,1,6));
@@ -267,7 +433,7 @@ public class GamePanel extends JPanel	implements Runnable {
 				figury.add(new Hetman(BLACK,3,0));
 				figury.add(new Krol(BLACK,4,0));
 			}
-			if(czy_horda=true){
+			if(czy_horda){
 				figury.add(new Pion(WHITE,0,6));
 				figury.add(new Pion(WHITE,1,6));
 				figury.add(new Pion(WHITE,2,6));
@@ -329,11 +495,12 @@ public class GamePanel extends JPanel	implements Runnable {
 				    @Override
 				    public void run() {
 				        try {
-				        	 ImageIcon obrazek = new ImageIcon("src/menu/meme.png"); // ścieżka względna lub bezwzględna
+				        	 ImageIcon obrazek = new ImageIcon("src/menu/meme.png"); 
 				             JLabel labelZObrazkiem = new JLabel(obrazek);
-
+				             
+				           
 				             // Dodaj obrazek do panelu
-				             add(labelZObrazkiem, BorderLayout.EAST); 
+				           //  add(labelZObrazkiem, BorderLayout.PAGE_END); 
 				            File soundFile = new File("src/menu/muzyka.wav");
 				            AudioInputStream audioIn = AudioSystem.getAudioInputStream(soundFile);
 				            Clip clip = AudioSystem.getClip();
@@ -349,8 +516,9 @@ public class GamePanel extends JPanel	implements Runnable {
 				    }
 				});
 				muzykaWatek.start();
-			}
 			
+			}
+			//
 		
 	}
 	private void copyFigury(ArrayList<figura> source,ArrayList<figura> target) {
@@ -580,7 +748,7 @@ public class GamePanel extends JPanel	implements Runnable {
 		   
 		
 	}
-	
+
 	@Override
 	public void run() {	
 		//zwykle sleep nie jest dobre do gier zreszta ma milisekdowa dokladnosc
@@ -594,15 +762,19 @@ public class GamePanel extends JPanel	implements Runnable {
 		lastTime=currentTime;
 		
 		if(delta>=1) {//sprawdzamy czy minel czas jednej klatki
-			update();
+			
+			if(przeciwnikBot) {
+				update1();
+			}
+			else {
+				update();
+			}
+			
 			repaint();
 			delta--;
-		}
+	}
 		
 	}
 	
-	
-		
-	}
-	
+}
 }
