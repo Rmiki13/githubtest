@@ -25,9 +25,9 @@ public class Tutorial extends JFrame {
     
     String [] poradnik = new String[3]; //może zastąpić to listą?????
     {
-    poradnik [0] = "Tu będzie tutorial szachowy!";
-    poradnik [1] = "Tutaj będzie druga strona tutorialu szachowego!";
-    poradnik [2] = "Tutaj będzie trzecia strona tutorialu szachowego!";
+    poradnik [0] = " Dawanie szacha białym jest mocno nie w porzadku";
+    poradnik [1] = "wieza nie moze skakac nad pionkiem(prosze tego nie probowac)";
+    poradnik [2] = "ladnie prosze nie uzywac trybu bot vs bot";
     }
 	
 	public Tutorial() throws HeadlessException {
